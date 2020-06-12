@@ -2,7 +2,7 @@ package com.lambda.demo.repositories;
 
 
 import com.lambda.demo.model.User;
-import com.lambda.demo.views.JustTheCount;
+import com.lambda.demo.views.UserCountTodos;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -15,37 +15,17 @@ import java.util.List;
  */
 public interface UserRepository extends CrudRepository<User, Long>
 {
-    /**
-     * Find a user based off over username
-     *
-     * @param username the name (String) of user you seek
-     * @return the first user object with the name you seek
-     */
-    User findByUsername(String username);
+//    List<UserCountTodos> getCountUserTodos();
 
-    /**
-     * Find all users whose name contains a given substring ignoring case
-     *
-     * @param name the substring of the names (String) you seek
-     * @return List of users whose name contain the given substring ignoring case
-     */
-    List<User> findByUsernameContainingIgnoreCase(String name);
 
-    @Query(value = "SELECT COUNT(*) as count FROM userroles WHERE userid = :userid AND roleid = :roleid", nativeQuery = true)
-    JustTheCount checkUserRolesCombo(long userid, long roleid);
+@Query(value = "SELECT u.username as username, count(t.todoid) as counttodos FROM users u JOIN todos t ON u.userid = t.userid WHERE NOT t.completed GROUP BY u.username",
+        nativeQuery = true)
+    List<UserCountTodos> getUserTodos();
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM userroles WHERE userid = :userid AND roleid = :roleid", nativeQuery = true)
-    void deleteUserRoles(long userid, long roleid);
-
-    @Transactional
-    @Modifying
-    @Query(value = "INSERT INTO userroles(userid, roleid, created_by, created_date, last_modified_by, last_modified_date) VALUES (:userid, :roleid, :uname, CURRENT_TIMESTAMP, :uname, CURRENT_TIMESTAMP)",
+    @Query(value = "DELETE FROM todos WHERE userid = :userid",
             nativeQuery = true)
-    void insertUserRoles(
-            String uname,
-            long userid,
-            long roleid);
+    void deleteUserTodos(long userid);
 
 }

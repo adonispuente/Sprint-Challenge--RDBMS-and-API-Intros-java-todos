@@ -5,19 +5,9 @@ import com.lambda.demo.model.Todos;
 import java.util.List;
 
 public interface TodoService {
-    /**
-     * Returns a list of all Role objects
-     *
-     * @return list of all Role object
-     */
-    List<Todos> findAll();
+    Todos save(long userid, String description);
 
+    Todos update(long id);
 
     Todos findTodoById(long id);
-
-
-    Object save(Todos todo);
-
-
-    Todos findByName(String name);
 }

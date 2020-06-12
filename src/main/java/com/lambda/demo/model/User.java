@@ -6,149 +6,80 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 @Entity
 @Table(name = "users")
-public class User extends Auditable{
-
+public class User extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long userid;
 
+    private Date createddate;
 
-    @Column(nullable = false,
-            unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false, unique = true)
+    // @Email
+    private String primaryemail;
 
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties(value = "user", allowSetters = true)
+    private List<Todos> todos = new ArrayList<>();
 
-    @Column(nullable = false,
-            unique = true)
-    @Email
-    private String primaryemail;
-
-
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    @JsonIgnoreProperties(value = "user",
-            allowSetters = true)
-    private List<Useremail> useremails = new ArrayList<>();
-
-
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = "user")
-    private List<UserTodos> todos = new ArrayList<>();
-
-
-    public User()
-    {
+    public User() {
     }
 
-
-    public User(
-            String username,
-            String password,
-            String primaryemail)
-    {
-        setUsername(username);
-        setPassword(password);
+    public User(String username, String password, String primaryemail) {
+        this.username = username;
         this.primaryemail = primaryemail;
-    }
-
-
-    public long getUserid()
-    {
-        return userid;
-    }
-
-
-    public void setUserid(long userid)
-    {
-        this.userid = userid;
-    }
-
-
-    public String getUsername()
-    {
-        if (username == null) // this is possible when updating a user
-        {
-            return null;
-        } else
-        {
-            return username.toLowerCase();
-        }
-    }
-
-
-    public void setUsername(String username)
-    {
-        this.username = username.toLowerCase();
-    }
-
-
-    public String getPrimaryemail()
-    {
-        if (primaryemail == null) // this is possible when updating a user
-        {
-            return null;
-        } else
-        {
-            return primaryemail.toLowerCase();
-        }
-    }
-
-
-    public void setPrimaryemail(String primaryemail)
-    {
-        this.primaryemail = primaryemail.toLowerCase();
-    }
-
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-
-    public void setPassword(String password)
-    {
         this.password = password;
     }
 
-
-    public List<Useremail> getUseremails()
-    {
-        return useremails;
+    public long getUserid() {
+        return userid;
     }
 
-
-    public void setUseremails(List<Useremail> useremails)
-    {
-        this.useremails = useremails;
+    public void setUserid(long userid) {
+        this.userid = userid;
     }
 
+    public String getUsername() {
+        return username;
+    }
 
-    public List<UserTodos> getTodos()
-    {
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPrimaryemail() {
+        return primaryemail;
+    }
+
+    public void setPrimaryemail(String primaryemail) {
+        this.primaryemail = primaryemail;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<Todos> getTodos() {
         return todos;
     }
 
-
-    public void setTodos(List<UserTodos> todos)
-    {
+    public void setTodos(List<Todos> todos) {
         this.todos = todos;
-    }
-
-    public void addTodo(Todos todo)
-    {
-        todos.add(new UserTodos(this, todo));
     }
 }

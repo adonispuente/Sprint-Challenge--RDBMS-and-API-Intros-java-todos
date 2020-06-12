@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface TodoRepository extends CrudRepository <Todos, Long>{
 
-    Todos findByNameIgnoreCase(String name);
+//    Todos findByNameIgnoreCase( String name);
 }

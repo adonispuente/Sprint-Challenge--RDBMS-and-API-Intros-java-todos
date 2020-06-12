@@ -2,6 +2,7 @@ package com.lambda.demo.services;
 
 
 import com.lambda.demo.model.Todos;
+import com.lambda.demo.model.User;
 import com.lambda.demo.repositories.TodoRepository;
 import com.lambda.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,43 +20,42 @@ public class TodoServiceImpl implements TodoService{
 
     @Autowired
     TodoRepository todorepos;
+
     @Autowired
-     UserRepository userrepos;
+    UserService userService;
 
+    @Transactional
     @Override
-    public List<Todos> findAll() {
-        List<Todos> list = new ArrayList<>();
-        todorepos.findAll()
-                .iterator()
-                .forEachRemaining(list::add);
-        return list;
+    public Todos update(long todoid)
+    {
+
+            Todos currentTodo = todorepos.findById(todoid)
+                    .orElseThrow(()-> new EntityNotFoundException("Todo " + todoid + " Not Found"));
+
+            currentTodo.setCompleted(true);
+            return todorepos.save(currentTodo);
+
+
     }
 
+
+    @Transactional
     @Override
-    public Todos findTodoById(long id) {
+    public Todos save(
+            long userid,
+            String description)
+    {
+        User currentUser = userService.findUserById(userid);
+
+        Todos newTodo = new Todos(currentUser,
+                description);
+        return todorepos.save(newTodo);
+    }
+
+    public Todos findTodoById(long id) throws EntityNotFoundException
+    {
         return todorepos.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Role id " + id + " not found!"));    }
-
-    @Override
-    public Object save(Todos todo) {
-        if (todo.getUsers()
-                .size() > 0)
-        {
-            throw new EntityExistsException("User Todos are not updated through Todo.");
-        }
-
-        return todorepos.save(todo);
+                .orElseThrow(() -> new EntityNotFoundException("Todo id " + id + " not found!"));
     }
 
-    @Override
-    public Todos findByName(String name) {
-        Todos td = todorepos.findByNameIgnoreCase(name);
-
-        if (td != null)
-        {
-            return td;
-        } else
-        {
-            throw new EntityNotFoundException(name);
-        }    }
 }

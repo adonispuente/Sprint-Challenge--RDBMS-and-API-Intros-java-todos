@@ -12,64 +12,46 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-
 @RestController
 @RequestMapping("/todos")
-public class TodosController {
+public class TodosController
+{
+
     @Autowired
     TodoService todoService;
 
 
-
-    @GetMapping(value = "/todos",
-            produces = {"application/json"})
-    public ResponseEntity<?> listRoles()
+    //POST http://localhost:2021/todos/user/4
+    @PostMapping(value = "/user/{userid}")
+    public ResponseEntity<?> addNewTodo(
+            @PathVariable
+                    long userid,
+            @RequestBody
+                    Todos todo) throws URISyntaxException
     {
-        List<Todos> allRoles = todoService.findAll();
-        return new ResponseEntity<>(allRoles,
-                HttpStatus.OK);
-    }
-
-
-    @GetMapping(value = "/role/{todoId}",
-            produces = {"application/json"})
-    public ResponseEntity<?> getTodoById(@PathVariable Long todoId)
-    {
-        Todos t = todoService.findTodoById(todoId);
-        return new ResponseEntity<>(t,
-                HttpStatus.OK);
-    }
-
-
-    @GetMapping(value = "/role/name/{roleName}",
-            produces = {"application/json"})
-    public ResponseEntity<?> getRoleByName(
-            @PathVariable String todoName)
-    {
-        Todos t = todoService.findByName(todoName);
-        return new ResponseEntity<>(t, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/todo",
-            consumes = {"application/json"})
-    public ResponseEntity<?> addNewRole(@Valid @RequestBody Todos newTodo)
-    {
-        // ids are not recognized by the Post method
-        newTodo.setTodoid(0);
-        newTodo = (Todos) todoService.save(newTodo);
+        Todos newTodo = todoService.save(userid,
+                todo.getDescription());
 
         // set the location header for the newly created resource
         HttpHeaders responseHeaders = new HttpHeaders();
-        URI newRoleURI = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{todoId}")
+        URI newTodoURI = ServletUriComponentsBuilder.fromCurrentServletMapping()
+                .path("/todos/user/{userid}")
                 .buildAndExpand(newTodo.getTodoid())
                 .toUri();
-        responseHeaders.setLocation(newRoleURI);
+        responseHeaders.setLocation(newTodoURI);
 
         return new ResponseEntity<>(null,
                 responseHeaders,
                 HttpStatus.CREATED);
+    }
+//PATCH http://localhost:2021/todos/todo/7 grdsfreafrdgregrewwafefeafrdfrda
+    @PatchMapping(value = "/todo/{todoid}")
+    public ResponseEntity<?> updateTodo(@PathVariable long todoid)
+    {
+        todoService.update(todoid);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

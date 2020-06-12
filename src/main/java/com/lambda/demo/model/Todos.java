@@ -14,21 +14,22 @@ public class Todos extends Auditable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long todoid;
 
-    @Column(nullable = false,
-            unique = true)
-    private String name;
+    @Column(nullable = false)
+    private String description;
 
-    @OneToMany(mappedBy = "todos", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = "todo")
-    private List<UserTodos> users = new ArrayList<>();
+    private boolean completed = false;
+
+    @ManyToOne
+    @JoinColumn(name = "userid", nullable = false)
+    @JsonIgnoreProperties(value = "todos", allowSetters = true)
+    private User user;
 
     public Todos() {
     }
-    public Todos(String name){
-        this.name = name.toUpperCase();
-    }
 
-    public Todos(User u1, String give_joe_access_rights) {
+    public Todos(User user, String description) {
+        this.description = description;
+        this.user = user;
     }
 
     public long getTodoid() {
@@ -39,26 +40,28 @@ public class Todos extends Auditable {
         this.todoid = todoid;
     }
 
-    public String getName() {
-
-        if (name == null)
-        {
-            return null;
-        } else
-        {
-            return name.toUpperCase();
-        }
+    public String getDescription() {
+        return description;
     }
 
-    public void setName(String name) {
-        this.name = name.toUpperCase();
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public List<UserTodos> getUsers() {
-        return users;
+    public boolean isCompleted() {
+        return completed;
     }
 
-    public void setUsers(List<UserTodos> users) {
-        this.users = users;
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }
